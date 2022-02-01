@@ -6,10 +6,17 @@ import 'package:time_tracker/app/sign_in/social_sign_in_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInPage extends StatelessWidget {
-  void _signInAnonymously() async {
+  SignInPage({required this.onSignIn});
+
+  final Function(User) onSignIn;
+  Future<void> _signInAnonymously() async {
     await Firebase.initializeApp();
-    final authResult = await FirebaseAuth.instance.signInAnonymously();
-    print(authResult.user!.uid);
+    try {
+      final authResult = await FirebaseAuth.instance.signInAnonymously();
+      onSignIn(authResult.user!);
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -46,7 +53,8 @@ class SignInPage extends StatelessWidget {
             color: Colors.white,
             onPressed: () {},
             text: 'Sign in with Google',
-            textColor: Colors.black87, assetName: 'images/google-logo.png',
+            textColor: Colors.black87,
+            assetName: 'images/google-logo.png',
           ),
           const SizedBox(
             height: 8.0,
@@ -55,7 +63,8 @@ class SignInPage extends StatelessWidget {
             color: const Color(0xFF334d92),
             onPressed: () {},
             text: 'Sign in with Facebook',
-            textColor: Colors.white, assetName: 'images/facebook-logo.png',
+            textColor: Colors.white,
+            assetName: 'images/facebook-logo.png',
           ),
           const SizedBox(
             height: 8.0,
