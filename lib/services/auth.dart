@@ -14,6 +14,12 @@ abstract class AuthBase {
 
   Future<UserAuth?> signInAnonymously();
 
+  Future<UserAuth?> signInWithEmailAndPassword(
+      {required String email, required String password});
+
+  Future<UserAuth?> createWithEmailAndPassword(
+      {required String email, required String password});
+
   Future<UserAuth?> signInWithGoogle();
 
   Future<UserAuth?> signInWithFacebook();
@@ -25,6 +31,7 @@ abstract class AuthBase {
 
 class Auth implements AuthBase {
   final _firebaseAuth = FirebaseAuth.instance;
+  final _facebookAuth = FacebookAuth.instance;
 
   UserAuth? _userFromFirebase(User? user) {
     if (user == null) {
@@ -51,12 +58,28 @@ class Auth implements AuthBase {
   }
 
   @override
+  Future<UserAuth?> signInWithEmailAndPassword(
+      {required String email, required String password}) async {
+    final authResult = await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
+    return _userFromFirebase(authResult.user);
+  }
+
+  @override
+  Future<UserAuth?> createWithEmailAndPassword(
+      {required String email, required String password}) async {
+    final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    return _userFromFirebase(authResult.user);
+  }
+
+  @override
   Future<UserAuth?> signInWithGoogle() async {
     final googleSignIn = GoogleSignIn();
     final googleAccount = await googleSignIn.signIn();
     if (googleAccount != null) {
       GoogleSignInAuthentication googleAuth =
-          await googleAccount.authentication;
+      await googleAccount.authentication;
       if (googleAuth.idToken != null && googleAuth.accessToken != null) {
         final authResult = await _firebaseAuth.signInWithCredential(
           GoogleAuthProvider.credential(
@@ -76,7 +99,7 @@ class Auth implements AuthBase {
 
   @override
   Future<UserAuth?> signInWithFacebook() async {
-    final result = await FacebookAuth.i.login(permissions: ["public_profile"]);
+    final result = await _facebookAuth.login(permissions: ["public_profile"]);
     if (result.accessToken != null) {
       final authResult = await _firebaseAuth.signInWithCredential(
           FacebookAuthProvider.credential(result.accessToken!.token));
@@ -91,7 +114,8 @@ class Auth implements AuthBase {
   Future<void> signOut() async {
     final googleSignIn = GoogleSignIn();
     await googleSignIn.signOut();
-    await FacebookAuth.i.logOut();
+    //TODO Log-out not working
+    await _facebookAuth.logOut();
     await _firebaseAuth.signOut();
   }
 }
