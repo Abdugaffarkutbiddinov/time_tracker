@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:time_tracker/widgets/custom_raised_button.dart';
 
 class FormSubmitButton extends CustomRaisedButton {
-  FormSubmitButton({required String text, required VoidCallback onPressed})
+  FormSubmitButton({required String text, required VoidCallback? onPressed})
       : super(
             child: Text(
               text,
