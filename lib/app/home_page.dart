@@ -1,13 +1,19 @@
+
+
 import 'package:flutter/material.dart';
-import 'package:time_tracker/services/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:time_tracker/widgets/platform_alert_dialog.dart';
 
+import '../services/auth.dart';
+
 class HomePage extends StatelessWidget {
-  HomePage({required this.auth});
-  final AuthBase auth;
-  Future<void> _signOut() async {
+  const HomePage({Key? key}) : super(key: key);
+
+
+  Future<void> _signOut(BuildContext context) async {
     // await Firebase.initializeApp();
     try {
+      final auth = Provider.of<AuthBase>(context);
       await auth.signOut();
     } catch (e) {
       print(e.toString());
@@ -22,7 +28,7 @@ class HomePage extends StatelessWidget {
       cancelActionText: 'Cancel',
     ).show(context);
     if (didRequestSignOut == true) {
-      _signOut();
+      _signOut(context);
     }
    }
 
