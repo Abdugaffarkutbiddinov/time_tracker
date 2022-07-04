@@ -1,16 +1,17 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:time_tracker/app/sign_in/validators.dart';
 import 'package:time_tracker/widgets/form_submit_button.dart';
 import 'package:time_tracker/widgets/platform_alert_dialog.dart';
+import 'package:time_tracker/widgets/platform_exception_alert_dialog.dart';
 
 import '../../services/auth.dart';
+
 enum EmailSignInFormType { signIn, register }
 
 class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidators {
   EmailSignInForm({Key? key}) : super(key: key);
-
 
   @override
   State<EmailSignInForm> createState() => _EmailSignInFormState();
@@ -31,27 +32,33 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
 
   bool _submitted = false;
   bool _isLoading = false;
-
+@override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
   void _submit() async {
     setState(() {
       _submitted = true;
       _isLoading = true;
     });
     try {
-      final auth = Provider.of<AuthBase>(context);
+      final auth = Provider.of<AuthBase>(context, listen: false);
       if (_formType == EmailSignInFormType.signIn) {
-        await auth
-            .signInWithEmailAndPassword(email: _email, password: _password);
+        await auth.signInWithEmailAndPassword(
+            email: _email, password: _password);
       } else {
-        await auth
-            .createWithEmailAndPassword(email: _email, password: _password);
+        await auth.createWithEmailAndPassword(
+            email: _email, password: _password);
       }
       Navigator.of(context).pop();
-    } catch (e) {
-      PlatformAlertDialog(
+    } on PlatformException catch (e) {
+      PlatformExceptionAlertDialog(
         title: 'Sign in failed',
-        content: e.toString(),
-        defaultActionText: 'OK',
+        exception: e,
       ).show(context);
     } finally {
       setState(() {

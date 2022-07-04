@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Provider<AuthBase>(
       create: (context) => Auth(),
+
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
