@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:time_tracker/widgets/platform_alert_dialog.dart';
 
-import '../services/auth.dart';
+import '../../services/auth.dart';
+import '../../services/database.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+class JobsPage extends StatelessWidget {
+  const JobsPage({Key? key}) : super(key: key);
 
 
   Future<void> _signOut(BuildContext context) async {
-    // await Firebase.initializeApp();
     try {
       final auth = Provider.of<AuthBase>(context, listen: false);
       await auth.signOut();
@@ -31,13 +31,19 @@ class HomePage extends StatelessWidget {
       _signOut(context);
     }
    }
+  Future<void> _createJob(BuildContext context) async {
+    final database = Provider.of<Database>(context, listen: false);
+    await database.createJob({'name': 'Blogging',
+    'ratePerHour' : 10,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text('Jobs'),
         actions: [
           TextButton(
             child: Text(
@@ -51,6 +57,8 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(child: const Icon(Icons.add), onPressed: () => _createJob(context),),
     );
   }
+
 }
