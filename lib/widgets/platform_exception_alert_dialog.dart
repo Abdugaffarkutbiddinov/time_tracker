@@ -3,11 +3,11 @@ import 'package:time_tracker/widgets/platform_alert_dialog.dart';
 
 class PlatformExceptionAlertDialog extends PlatformAlertDialog {
   PlatformExceptionAlertDialog(
-      {required String title, required PlatformException exception})
+      {required String title, required Exception exception})
       : super(
             title: title, content: _message(exception)!, defaultActionText: "OK");
-  static String? _message(PlatformException exception) {
-    return _errors[exception.code] ?? exception.message;
+  static String? _message(Exception exception) {
+    return exception.toString();
   }
   static final Map<String, String> _errors = {
     ///   • `ERROR_WEAK_PASSWORD` - If the password is not strong enough.
