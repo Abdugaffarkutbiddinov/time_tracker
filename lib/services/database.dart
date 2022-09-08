@@ -6,6 +6,8 @@ abstract class Database {
   Future<void> setJob(Job job);
 
   Stream<List<Job>> jobsStream();
+
+  Future<void> deleteJob(Job job);
 }
 String documentIdFromCurrentDate() => DateTime.now().toIso8601String();
 
@@ -22,4 +24,7 @@ class FirestoreDatabase implements Database {
   @override
   Stream<List<Job>> jobsStream() => _service.collectionStream(
       path: APIPath.jobs(uid), builder: (data, documentId) => Job.fromMap(data, documentId));
+
+  @override
+  Future<void> deleteJob(Job job) async => await _service.deleteData(path: APIPath.job(uid, job.id));
 }

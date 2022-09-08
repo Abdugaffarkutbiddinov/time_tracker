@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:time_tracker/app/home/jobs/edit_job_page.dart';
+import 'package:time_tracker/app/home/jobs/emty_content.dart';
 import 'package:time_tracker/app/home/jobs/job_list_tile.dart';
+import 'package:time_tracker/app/home/jobs/list_item_builder.dart';
 import 'package:time_tracker/app/home/models/job.dart';
 import 'package:time_tracker/widgets/platform_alert_dialog.dart';
 import 'package:time_tracker/widgets/platform_exception_alert_dialog.dart';
@@ -31,6 +33,18 @@ class JobsPage extends StatelessWidget {
     ).show(context);
     if (didRequestSignOut == true) {
       _signOut(context);
+    }
+  }
+
+  _delete(BuildContext context, Job job) async {
+    try {
+      final database = Provider.of<Database>(context, listen: false);
+      await database.deleteJob(job);
+    } on PlatformException catch (e) {
+      PlatformExceptionAlertDialog(
+        title: 'Operation failed',
+        exception: e,
+      ).show(context);
     }
   }
 
@@ -63,30 +77,23 @@ class JobsPage extends StatelessWidget {
   Widget _buildContent(BuildContext context) {
     final database = Provider.of<Database>(context, listen: false);
     return StreamBuilder<List<Job>>(
-        stream: database.jobsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final jobs = snapshot.data;
-            final children = jobs
-                ?.map(
-                  (job) => JobListTile(
-                    job: job,
-                    onTap: () => EditJobPage.show(context, job: job),
-                  ),
-                )
-                .toList();
-            return ListView(
-              children: children!,
-            );
-          }
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text("error happened"),
-            );
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+      stream: database.jobsStream(),
+      builder: (context, snapshot) {
+        return ListItemBuilder<Job>(
+          snapshot: snapshot,
+          itemBuilder: (context, job) => Dismissible(
+          key: Key('job-${job.id}'),
+            background: Container(color: Colors.red,),
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) => _delete(context, job),
+            child: JobListTile(
+              job: job,
+              onTap: () => EditJobPage.show(context, job: job),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
+
