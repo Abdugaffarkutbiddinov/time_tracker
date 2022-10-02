@@ -11,6 +11,7 @@ import 'package:time_tracker/widgets/platform_exception_alert_dialog.dart';
 
 import '../../../services/auth.dart';
 import '../../../services/database.dart';
+import '../job_entries/job_entries_page.dart';
 
 class JobsPage extends StatelessWidget {
   const JobsPage({Key? key}) : super(key: key);
@@ -69,7 +70,8 @@ class JobsPage extends StatelessWidget {
       body: _buildContent(context),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => EditJobPage.show(context),
+        onPressed: () => EditJobPage.show(context,
+            database: Provider.of<Database>(context, listen: false)),
       ),
     );
   }
@@ -82,13 +84,15 @@ class JobsPage extends StatelessWidget {
         return ListItemBuilder<Job>(
           snapshot: snapshot,
           itemBuilder: (context, job) => Dismissible(
-          key: Key('job-${job.id}'),
-            background: Container(color: Colors.red,),
+            key: Key('job-${job.id}'),
+            background: Container(
+              color: Colors.red,
+            ),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) => _delete(context, job),
             child: JobListTile(
               job: job,
-              onTap: () => EditJobPage.show(context, job: job),
+              onTap: () => JobEntriesPage.show(context, job),
             ),
           ),
         );
@@ -96,4 +100,3 @@ class JobsPage extends StatelessWidget {
     );
   }
 }
-

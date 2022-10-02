@@ -12,9 +12,7 @@ class EditJobPage extends StatefulWidget {
   final Database database;
   final Job? job;
 
-  static Future<void> show(BuildContext context, {Job? job}) async {
-    /// With context of parent widget
-    final database = Provider.of<Database>(context, listen: false);
+  static Future<void> show(BuildContext context,{required Database database , Job? job}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
           builder: (context) => EditJobPage(
